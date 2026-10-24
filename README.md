@@ -9,7 +9,7 @@ The skill includes language-specific guidance for TypeScript, JavaScript, and PH
 This skill is published from this GitHub repository and can be installed with the [skills CLI](https://skills.sh/):
 
 ```sh
-npx skills add ciscoheat/dci-code --skill dci
+npx skills add ciscoheat/dci-code
 ```
 
 The CLI installs the `dci` skill for a supported coding agent. To check for and install updates later:
