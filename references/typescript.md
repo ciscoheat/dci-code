@@ -7,6 +7,10 @@
 - Group each Role's binding and methods in `//#region RoleName Role /////` / `//#endregion` blocks. Put the Role binding first in its region.
 - Bind all Roles before interaction unless there is a compelling reason to defer binding. Keep a transient Context's System Operation visible at the end of the function, after the Role regions. Use guards there if needed, then make one initial RoleMethod call. That method should start a coherent message chain through other Roles' RoleMethods, rather than having the Context call several apparently unrelated RoleMethods. Otherwise, return an object exposing System Operation methods for later invocation.
 
+## Hello world example
+
+A transient Context, demonstrating Role binding and interaction. The Speaker Role is passed to the Context, the World Role is assigned directly to console in this simple example.
+
 ```ts
 /**
  * A Speaker proclaims something to the World, that dutifully notes it.
@@ -40,3 +44,112 @@ function SayHello(speaker: { phrase: string }): void {
 ```
 
 Only `World_*` methods access `World` directly. `Speaker_proclaim` only sends it a message. The `Speaker` Role is the original `speaker` object, bound inside its region; the System Operation sends one message to `Speaker_proclaim`, which sends the next to `World_note`. For a collection Role, use a contract such as `Messages: Iterable<{ show(message: string): void }>` and iterate only inside `Messages_*` methods.
+
+## Money transfer example
+
+A simplified use case of a Money transfer in a banking domain. Demonstrates the distributed algorithm and how it builds the state throughout the Context, contract-like assertions, and returning an object for future use, compared to a transient context (even though this Context could be written as transient). Also shows how to use an interface instead of literal types, when multiple roles have the same contract.
+
+```ts
+export interface TransferRecord {
+  id: string;
+  fromAccountId: string;
+  toAccountId: string;
+  amount: number;
+  occurredAt: string;
+}
+
+export interface Account {
+  id: string;
+  readonly balance: number;
+  ledger: TransferRecord[];
+}
+
+/** @DCI-context */
+export function MoneyTransfer(
+  sourceAccount: Account,
+  destinationAccount: Account,
+  amount: number,
+): void {
+  //#region SourceAccount Role /////
+
+  const SourceAccount = sourceAccount;
+
+  function SourceAccount_validate(): void {
+    if (
+      !Number.isSafeInteger(SourceAccount.balance) ||
+      SourceAccount.balance < 0
+    ) {
+      throw new RangeError(
+        "Source account balance must be a non-negative safe integer",
+      );
+    }
+    if (amount > SourceAccount.balance) {
+      throw new RangeError("Insufficient funds");
+    }
+    if (!Array.isArray(SourceAccount.ledger)) {
+      throw new TypeError("Source account ledger must be an array");
+    }
+
+    DestinationAccount_validate();
+  }
+
+  function SourceAccount_transfer(): void {
+    const transfer: TransferRecord = {
+      id: Math.random().toString(36).substring(2, 15),
+      fromAccountId: SourceAccount.id,
+      toAccountId: DestinationAccount.id,
+      amount: amount,
+      occurredAt: new Date().toISOString(),
+    };
+    SourceAccount.ledger.push(transfer);
+
+    DestinationAccount_receive(transfer);
+  }
+  //#endregion
+
+  //#region DestinationAccount Role /////
+
+  const DestinationAccount = destinationAccount;
+
+  function DestinationAccount_validate(): void {
+    if (
+      !Number.isSafeInteger(DestinationAccount.balance) ||
+      DestinationAccount.balance < 0
+    ) {
+      throw new RangeError(
+        "Destination account balance must be a non-negative safe integer",
+      );
+    }
+    if (!Number.isSafeInteger(DestinationAccount.balance + amount)) {
+      throw new RangeError(
+        "Destination account balance would exceed the safe integer range",
+      );
+    }
+    if (!Array.isArray(DestinationAccount.ledger)) {
+      throw new TypeError("Destination account ledger must be an array");
+    }
+
+    SourceAccount_transfer();
+  }
+
+  function DestinationAccount_receive(transfer: TransferRecord): void {
+    DestinationAccount.ledger.push(transfer);
+  }
+
+  //#endregion
+
+  {
+    if (SourceAccount === DestinationAccount) {
+      throw new RangeError("Source and destination accounts must be different");
+    }
+
+    if (!Number.isSafeInteger(amount) || amount <= 0) {
+      throw new RangeError("Transfer amount must be a positive safe integer");
+    }
+
+    return {
+      transfer: () => SourceAccount_validate();
+    }
+  }
+}
+```
