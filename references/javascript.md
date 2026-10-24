@@ -1,11 +1,15 @@
 # JavaScript
 
-- Use a function (async when needed) annotated `@DCI-context`. Add `// @ts-check` in new files.
+- Use a function (async when needed) annotated `@DCI-context`. Add `// @ts-check` to new files when the project supports JavaScript type checking.
 - Keep caller-facing Context parameters in lower camel case, then bind caller-supplied objects to PascalCase Role aliases inside their regions, for example `const SourceAccount = sourceAccount;`. This is an identity-preserving alias, not a copy or wrapper.
 - Prefer an existing domain typedef or JSDoc contract for a Role when one already describes the needed data. Otherwise use a small inline JSDoc object contract; do not add unrelated properties.
 - Name RoleMethods `Role_method`; use `Role__method` for same-Role-only methods. These are lexical functions, not methods attached to Data objects. Add a return value type to the RoleMethods.
 - Group each Role's binding and methods in `//#region RoleName Role /////` / `//#endregion` blocks. Put the Role binding first; add `@type` when its contract cannot be inferred from the parameter or initializer.
 - Bind all Roles before interaction unless there is a compelling reason to defer binding. Keep a transient Context's System Operation visible at the end of the function, after the Role regions. Use guards there if needed, then make one initial RoleMethod call. That method should start a coherent message chain through other Roles' RoleMethods, rather than having the Context call several apparently unrelated RoleMethods. Otherwise, return an object exposing System Operation methods for later invocation.
+
+## Validation
+
+For files with `// @ts-check`, run the project's configured JavaScript/type checker and inspect editor diagnostics, such as VS Code Problems, for every changed file. Passing runtime tests alone does not check JSDoc types. Resolve all reported diagnostics before claiming verification. If no checker is configured or available, state that type checking could not be run.
 
 ## Hello world example
 

@@ -7,6 +7,10 @@
 - Group each Role's binding and methods in `//#region RoleName Role /////` / `//#endregion` blocks. Put the Role binding first in its region.
 - Bind all Roles before interaction unless there is a compelling reason to defer binding. Keep a transient Context's System Operation visible at the end of the function, after the Role regions. Use guards there if needed, then make one initial RoleMethod call. That method should start a coherent message chain through other Roles' RoleMethods, rather than having the Context call several apparently unrelated RoleMethods. Otherwise, return an object exposing System Operation methods for later invocation.
 
+## Validation
+
+Run the project's configured TypeScript checker and inspect editor diagnostics, such as VS Code Problems, for every changed file. Passing tests or running Node with `--experimental-strip-types` only verifies runtime behavior; it does not type-check the code. Resolve all reported diagnostics before claiming verification. If no type checker is configured or available, state that type checking could not be run.
+
 ## Hello world example
 
 A transient Context, demonstrating Role binding and interaction. The Speaker Role is passed to the Context, the World Role is assigned directly to console in this simple example.
