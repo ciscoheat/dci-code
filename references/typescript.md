@@ -9,7 +9,7 @@
 
 ## Validation
 
-Run the project's configured TypeScript checker and inspect editor diagnostics, such as VS Code Problems, for every changed file. Passing tests or running Node with `--experimental-strip-types` only verifies runtime behavior; it does not type-check the code. Resolve all reported diagnostics before claiming verification. If no type checker is configured or available, state that type checking could not be run.
+Run the project's configured TypeScript checker and inspect editor diagnostics, such as VS Code Problems, workspace-wide after editing. Some diagnostics providers can omit compiler errors when queried with a file filter, so a filtered result with no errors is not enough to claim the workspace is clean. If errors persist or scoped results conflict with what the user sees, rerun diagnostics without file filters and resolve the reported errors. Passing tests or running Node with `--experimental-strip-types` only verifies runtime behavior; it does not type-check the code. If no type checker is configured or available, state that type checking could not be run.
 
 ## Hello world example
 

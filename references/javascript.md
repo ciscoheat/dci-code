@@ -9,7 +9,7 @@
 
 ## Validation
 
-For files with `// @ts-check`, run the project's configured JavaScript/type checker and inspect editor diagnostics, such as VS Code Problems, for every changed file. Passing runtime tests alone does not check JSDoc types. Resolve all reported diagnostics before claiming verification. If no checker is configured or available, state that type checking could not be run.
+When JavaScript type checking is enabled through `// @ts-check` or project configuration, run the project's configured JavaScript checker and inspect editor diagnostics, such as VS Code Problems, workspace-wide after editing. Some diagnostics providers can omit compiler errors when queried with a file filter, so a filtered result with no errors is not enough to claim the workspace is clean. If errors persist or scoped results conflict with what the user sees, rerun diagnostics without file filters and resolve the reported errors. Passing runtime tests alone does not check JSDoc types. If no checker is configured or available, state that type checking could not be run.
 
 ## Hello world example
 

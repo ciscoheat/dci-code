@@ -28,4 +28,4 @@ description: Write, refactor, or review code using the DCI (Data, Context and In
 
 ## Final Check
 
-Inspect every RoleMethod for cross-Role property access, missing contracts, incorrect naming/visibility, and unbound Roles. Confirm identity is preserved, bindings are complete before interaction, and that a System Operation starts a coherent RoleMethod message chain (immediately or through returned System Operations, matching the chosen lifetime). Verify behavior, including relevant failure paths; report checks that could not run.
+Inspect every RoleMethod for cross-Role property access, missing contracts, incorrect naming/visibility, and unbound Roles. Confirm identity is preserved, bindings are complete before interaction, and that a System Operation starts a coherent RoleMethod message chain (immediately or through returned System Operations, matching the chosen lifetime). Verify behavior, including relevant failure paths. Check editor diagnostics workspace-wide after edits; an empty file-filtered result is not sufficient to conclude there are no diagnostics. Resolve reported errors and report checks that could not run.
